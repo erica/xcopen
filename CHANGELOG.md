@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.0.5
+* All of -h, -help, and --help will work but the double-dash version does not appear in usage.
+* Decided to hide `-focus`. It's still there but it's really not for everyone. If there were long help in the argument parser, I'd include it with a caution in long help. No change in functionality, it just won't appear in usage.
+
+## 0.0.4
+* Bugfix: dependencies should no longer fail
+* Added `-focus` for Paul Hudson. It may or may not work for you and relies on the localization of the menus to match my localization.
+* Secret feature: -pkg opens Package.swift in TextEdit
+
 ## 0.0.3
 
 * Add swift-argument-parser support with help
