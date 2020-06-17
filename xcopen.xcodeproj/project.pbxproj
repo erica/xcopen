@@ -3,12 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		8E312F562493DF3800734C68 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E312F552493DF3800734C68 /* main.swift */; };
 		8E312F5C2493DFDD00734C68 /* xcopen in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8E312F522493DF3800734C68 /* xcopen */; };
+		8EDA4310249A9BEC00F70C2F /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 8EDA430F249A9BEC00F70C2F /* ArgumentParser */; };
+		8EDA4313249A9C0200F70C2F /* GeneralUtility in Frameworks */ = {isa = PBXBuildFile; productRef = 8EDA4312249A9C0200F70C2F /* GeneralUtility */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8EDA4313249A9C0200F70C2F /* GeneralUtility in Frameworks */,
+				8EDA4310249A9BEC00F70C2F /* ArgumentParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +84,10 @@
 			dependencies = (
 			);
 			name = xcopen;
+			packageProductDependencies = (
+				8EDA430F249A9BEC00F70C2F /* ArgumentParser */,
+				8EDA4312249A9C0200F70C2F /* GeneralUtility */,
+			);
 			productName = xcopen;
 			productReference = 8E312F522493DF3800734C68 /* xcopen */;
 			productType = "com.apple.product-type.tool";
@@ -108,6 +116,10 @@
 				Base,
 			);
 			mainGroup = 8E312F492493DF3800734C68;
+			packageReferences = (
+				8EDA430E249A9BEC00F70C2F /* XCRemoteSwiftPackageReference "swift-argument-parser" */,
+				8EDA4311249A9C0200F70C2F /* XCRemoteSwiftPackageReference "Swift-General-Utility" */,
+			);
 			productRefGroup = 8E312F532493DF3800734C68 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -286,6 +298,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8EDA430E249A9BEC00F70C2F /* XCRemoteSwiftPackageReference "swift-argument-parser" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-argument-parser";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
+		};
+		8EDA4311249A9C0200F70C2F /* XCRemoteSwiftPackageReference "Swift-General-Utility" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/erica/Swift-General-Utility.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8EDA430F249A9BEC00F70C2F /* ArgumentParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EDA430E249A9BEC00F70C2F /* XCRemoteSwiftPackageReference "swift-argument-parser" */;
+			productName = ArgumentParser;
+		};
+		8EDA4312249A9C0200F70C2F /* GeneralUtility */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8EDA4311249A9C0200F70C2F /* XCRemoteSwiftPackageReference "Swift-General-Utility" */;
+			productName = GeneralUtility;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8E312F4A2493DF3800734C68 /* Project object */;
 }

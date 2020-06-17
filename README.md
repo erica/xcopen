@@ -2,6 +2,21 @@
 
 Because sometimes you really just want to cd and open whatever xcode project is in that folder.
 
+```
+USAGE: xcopen [<files> ...] [-a] [-d] [-n] [-b]
+
+ARGUMENTS:
+<files>                 Files to open. Leave blank to search for xcodeproj
+                        and xcworkspace in the working directory 
+
+OPTIONS:
+-all, -a                In addition, open Package.swift 
+-docs, -d               Open all .md and .txt files 
+-new, -n                Create new files and then open them in Xcode 
+-background, -bg, -b    Open Xcode in the background 
+-h, --help              Show help information.
+```
+
 
 ## Installation
 
