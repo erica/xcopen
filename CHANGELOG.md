@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.4
+* Bugfix: dependencies should no longer fail
+* Added -focus for Paul Hudson. It may or may not work for you and relies on the localization of the menus to match my localization.
+* Secret feature: -pkg opens Package.swift in TextEdit
+
 ## 0.0.3
 
 * Add swift-argument-parser support with help

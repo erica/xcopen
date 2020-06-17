@@ -17,11 +17,15 @@ let package = Package(
       .package(
         url:"https://github.com/apple/swift-argument-parser",
         .exact("0.0.6")),
+      .package(url: "https://github.com/erica/Swift-General-Utility", from: "0.0.1"),
     ],
     targets: [
         .target(
             name: "xcopen",
-            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")],
+            dependencies: [
+              .product(name: "ArgumentParser", package: "swift-argument-parser"),
+              .product(name: "GeneralUtility"),
+            ],
             path: "xcopen/"
             ),
     ],

@@ -17,6 +17,12 @@ struct Xcopen: ParsableCommand {
     @Flag(name: [.short, .customLong("new", withSingleDash: true)], help: "Create new files and then open them in Xcode")
     var newFiles: Bool
     
+    @Flag(name: [.short, .customLong("focus", withSingleDash: true)], help: "Set Xcode focus on the first file")
+    var focusXcode: Bool
+    
+    @Flag(name: [.short, .customLong("pkg", withSingleDash: true), .customLong("package", withSingleDash: true), .customLong("edit", withSingleDash: true)], help: .hidden)
+    var openPackageInTextEdit: Bool
+
     @Flag(name: [.customShort("b"), .customLong("bg", withSingleDash: true), .customLong("background", withSingleDash: true)], help: "Open Xcode in the background")
     var openInBackground: Bool
     
@@ -63,8 +69,44 @@ struct Xcopen: ParsableCommand {
             _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + ["-a", xcurl().path] + [file])
         }
     }
+    
+    func focus(_ filePath: String) throws {
+        guard FileManager.default.fileExists(atPath: filePath) else { return }
+        let file = URL(fileURLWithPath: filePath).lastPathComponent
+        let script = """
+            tell application "System Events"
+                tell process "Xcode"
+                    activate
+                    set frontmost to true
+                    click menu item "Open Quickly…" of menu "File" of menu bar 1
+                    key up option
+                    key up command
+                    keystroke "\(file)"
+                    delay 0.5
+                    keystroke return
+                    delay 0.2
+                    click menu item "Move Focus to Editor…" of menu "Navigate" of menu bar 1
+                    delay 0.1
+                    keystroke return
+                    delay 0.1
+                    click menu item "Reveal in Project Navigator" of menu "Navigate" of menu bar 1
+                end tell
+            end tell
+            """
+        _ = try Utility.execute(commandPath: "/usr/bin/osascript", arguments: ["-e", script])
+    }
+    
+    func openPkgInTextEdit() throws {
+        _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: ["-e", "Package.swift"])
+    }
 
     func run() throws {
+        
+        if openPackageInTextEdit {
+            try openPkgInTextEdit()
+            return
+        }
+        
         if newFiles {
             try createNewFilesAndOpen(files, bg: openInBackground)
             return
@@ -73,6 +115,14 @@ struct Xcopen: ParsableCommand {
         if docTypes {
             try searchAndXcodeOpen([".txt", ".md"], bg: openInBackground)
             return
+        }
+        
+        if !files.isEmpty && focusXcode {
+            try searchAndOpen([".xcodeproj", ".xcworkspace"] + (allXcodeTypes ? ["Project.swift"] : []), bg: openInBackground)
+            try focus(files[0])
+            return
+        } else if focusXcode {
+            throw RuntimeError("Focus requires a file name")
         }
         
         if files.isEmpty {
