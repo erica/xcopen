@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.0.6
+* Minor code cleanup
+
 ## 0.0.5
 * All of -h, -help, and --help will work but the double-dash version does not appear in usage.
 * Decided to hide `-focus`. It's still there but it's really not for everyone. If there were long help in the argument parser, I'd include it with a caution in long help. No change in functionality, it just won't appear in usage.

@@ -123,20 +123,19 @@ struct Xcopen: ParsableCommand {
             return
         }
         
-        if !files.isEmpty && focusXcode {
+        if focusXcode {
+            guard !files.isEmpty
+                else { throw RuntimeError("Focus requires a file name") }
             try searchAndOpen([".xcodeproj", ".xcworkspace"] + (allXcodeTypes ? ["Project.swift"] : []), bg: openInBackground)
             try focus(files[0])
             return
-        } else if focusXcode {
-            throw RuntimeError("Focus requires a file name")
         }
         
         if files.isEmpty {
             try searchAndOpen([".xcodeproj", ".xcworkspace"] + (allXcodeTypes ? ["Project.swift"] : []), bg: openInBackground)
-            return
+        } else {
+            try searchAndXcodeOpen(files, bg: openInBackground)
         }
-        
-        try searchAndXcodeOpen(files, bg: openInBackground)
     }
 }
 
