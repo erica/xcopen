@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.0.7
+Some undocumented "subcommand"-like personal tweaks for my own use:
+
+* `xcopen ws`: opens workspace in cwd
+* `xcopen docs`: same as `xcopen -docs`
+* `xcopen pkg`: same as undocumented `xcopen -pkg`
+* `xcopen xpkg`: opens package in cwd in Xcode
+* `xcopen <path-to-directory>`: opens non-dir files within that directory in Xcode, e.g. `xcopen Sources` or `xcopen .`
+
 ## 0.0.6
 * Minor code cleanup
 

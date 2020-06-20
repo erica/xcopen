@@ -26,7 +26,7 @@ struct Xcopen: ParsableCommand {
     
     @Flag(name: [.short, .customLong("pkg", withSingleDash: true), .customLong("package", withSingleDash: true), .customLong("edit", withSingleDash: true)], help: .hidden)
     var openPackageInTextEdit: Bool
-
+    
     @Flag(name: [.customShort("b"), .customLong("bg", withSingleDash: true), .customLong("background", withSingleDash: true)], help: "Open Xcode in the background")
     var openInBackground: Bool
     
@@ -35,7 +35,7 @@ struct Xcopen: ParsableCommand {
         let xclocation = try Utility.execute(commandPath: "/usr/bin/xcrun", arguments: ["xcode-select", "-p"])
         return URL(fileURLWithPath: xclocation).deletingLastPathComponent().deletingLastPathComponent()
     }
-        
+    
     /// Find all files in the working directory whose suffixes match the supplied strings
     func filesWithSuffixes(_ suffixes: [String]) throws -> [String] {
         let files = try! FileManager.default.contentsOfDirectory(atPath: ".")
@@ -47,7 +47,7 @@ struct Xcopen: ParsableCommand {
             return false
         })
     }
-
+    
     /// Search working folder for files matching the supplied patterns and open them with `open`
     func searchAndOpen(_ patterns: [String], bg: Bool = false) throws {
         let filesToOpen = try filesWithSuffixes(patterns)
@@ -78,35 +78,72 @@ struct Xcopen: ParsableCommand {
         guard FileManager.default.fileExists(atPath: filePath) else { return }
         let file = URL(fileURLWithPath: filePath).lastPathComponent
         let script = """
-            tell application "System Events"
-                tell process "Xcode"
-                    activate
-                    set frontmost to true
-                    click menu item "Open Quickly…" of menu "File" of menu bar 1
-                    key up option
-                    key up command
-                    keystroke "\(file)"
-                    delay 0.5
-                    keystroke return
-                    delay 0.2
-                    click menu item "Move Focus to Editor…" of menu "Navigate" of menu bar 1
-                    delay 0.1
-                    keystroke return
-                    delay 0.1
-                    click menu item "Reveal in Project Navigator" of menu "Navigate" of menu bar 1
-                end tell
-            end tell
-            """
+        tell application "System Events"
+        tell process "Xcode"
+        activate
+        set frontmost to true
+        click menu item "Open Quickly…" of menu "File" of menu bar 1
+        key up option
+        key up command
+        keystroke "\(file)"
+        delay 0.5
+        keystroke return
+        delay 0.2
+        click menu item "Move Focus to Editor…" of menu "Navigate" of menu bar 1
+        delay 0.1
+        keystroke return
+        delay 0.1
+        click menu item "Reveal in Project Navigator" of menu "Navigate" of menu bar 1
+        end tell
+        end tell
+        """
         _ = try Utility.execute(commandPath: "/usr/bin/osascript", arguments: ["-e", script])
     }
     
     func openPkgInTextEdit() throws {
         _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: ["-e", "Package.swift"])
     }
-
+    
     func run() throws {
         guard !help
             else { throw CleanExit.helpRequest() }
+        
+        // Little undocumented feature for my own use. Sort of subcommands
+        // without actually being subcommands.
+        var isDir: ObjCBool = false
+        if files.count == 1 {
+            switch files[0] {
+            case "ws":
+                // Just open a workspace if there's one here
+                try searchAndOpen([".xcworkspace"], bg: openInBackground)
+                return
+            case "docs":
+                // Just open docs
+                try searchAndXcodeOpen([".txt", ".md"], bg: openInBackground)
+                return
+            case "pkg":
+                // Just open Package.swift in Textedit
+                try openPkgInTextEdit()
+                return
+            case "xpkg":
+                // Just open Package.swift in Xcode
+                try searchAndXcodeOpen(["Package.swift"], bg: openInBackground)
+                return
+            case _ where FileManager.default.fileExists(atPath: files[0], isDirectory: &isDir) && isDir.boolValue == true :
+                let dirURL = URL(fileURLWithPath: files[0])
+                var filesToOpen: [String] = []
+                for file in try FileManager.default.contentsOfDirectory(atPath: files[0]) {
+                    let path = dirURL.appendingPathComponent(file).path
+                    _ = FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+                    if isDir.boolValue == true { continue }
+                    filesToOpen.append(path)
+                }
+                _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (openInBackground ? ["-g"] : []) + ["-a", xcurl().path] + filesToOpen)
+                return
+            default:
+                break
+            }
+        }
         
         if openPackageInTextEdit {
             try openPkgInTextEdit()
