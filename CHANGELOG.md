@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.8
+
+Updates to Swift Argument Parser 0.2.0
+
 ## 0.0.7
 Some undocumented "subcommand"-like personal tweaks for my own use:
 
