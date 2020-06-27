@@ -3,16 +3,19 @@
 import Foundation
 import GeneralUtility
 
-extension Xcopen {
+extension Utility {
     /// Remove "Contents/Developer" and return path to active Xcode
-    func xcurl() throws -> URL {
+    static func xcurl() throws -> URL {
         let xclocation = try Utility.execute(commandPath: "/usr/bin/xcrun", arguments: ["xcode-select", "-p"])
         return URL(fileURLWithPath: xclocation).deletingLastPathComponent().deletingLastPathComponent()
     }
     
     /// Find all files in the working directory whose suffixes match the supplied strings
-    func filesWithSuffixes(_ suffixes: [String]) throws -> [String] {
-        let files = try! FileManager.default.contentsOfDirectory(atPath: ".")
+    /// - Parameter suffixes: The endings of the files to open. This can match a suffix, extension, or entire file.
+    /// - Throws: FileManager errors on retrieving directory contents
+    /// - Returns: An array of files that match the provided suffixes
+    static func filesWithSuffixes(_ suffixes: [String]) throws -> [String] {
+        let files = try FileManager.default.contentsOfDirectory(atPath: ".")
         
         return files.filter({ file in
             for suffix in suffixes {
@@ -22,35 +25,62 @@ extension Xcopen {
         })
     }
     
+    // Activate Xcode unless backgrounding
+    static func activateXcode() throws {
+        let script = #"tell application "Xcode" to activate"#
+        _ = try Utility.execute(commandPath: "/usr/bin/osascript", arguments: ["-e", script])
+    }
+    
     /// Search working folder for files matching the supplied patterns and open them with `open`
-    func searchAndOpen(_ patterns: [String], bg: Bool = false) throws {
+    /// - Parameters:
+    ///   - patterns: Ending patterns by which to match files. This can match a suffix, extension, or entire file.
+    ///   - bg: Launch xcode in the background.
+    /// - Throws: A `RuntimeError` describing the failure in opening the files.
+    static func searchAndOpen(_ patterns: [String], bg: Bool = false) throws {
         let filesToOpen = try filesWithSuffixes(patterns)
-        try filesToOpen.forEach { file in
-            _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + [file])
-        }
+        guard !filesToOpen.isEmpty else { return }
+        _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + filesToOpen)
+        if !bg { try activateXcode() }
     }
     
     /// Search working folder for files matching the supplied patterns and open them with Xcode
-    func searchAndXcodeOpen(_ patterns: [String], bg: Bool = false) throws {
+    /// - Parameters:
+    ///   - patterns: Ending patterns by which to match files. This can match a suffix, extension, or entire file.
+    ///   - bg: Launch xcode in the background.
+    /// - Throws: A `RuntimeError` describing the failure in opening the files.
+    static func searchAndXcodeOpen(_ patterns: [String], bg: Bool = false) throws {
         let filesToOpen = try filesWithSuffixes(patterns)
+        guard !filesToOpen.isEmpty else { return }
         _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + ["-a", xcurl().path] + filesToOpen)
+        if !bg { try activateXcode() }
     }
     
     /// Create each file and then open it in Xcode. Open but do not create if file exists
-    func createNewFilesAndOpen(_ files: [String], bg: Bool = false) throws {
+    /// - Parameters:
+    ///   - patterns: Ending patterns by which to match files. This can match a suffix, extension, or entire file.
+    ///   - bg: Launch xcode in the background.
+    /// - Throws: A `RuntimeError` describing the failure in opening the files.
+    static func createNewFilesAndOpen(_ files: [String], bg: Bool = false) throws {
         for file in files {
             if !FileManager.default.fileExists(atPath: file) {
                 FileManager.default.createFile(atPath: file, contents: "".data(using: .utf8), attributes: nil)
             }
         }
-        for file in files {
-            _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + ["-a", xcurl().path] + [file])
-        }
+        
+        _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + ["-a", xcurl().path] + files)
     }
     
-    func focus(_ filePath: String) throws {
-        guard FileManager.default.fileExists(atPath: filePath) else { return }
+    /// Opens and focuses the file.
+    ///
+    /// This should probably never be used. Leaving it here for my own personal reference.
+    /// - Parameter filePath: The file to focus
+    /// - Throws: A `RuntimeError`
+    static func focus(_ filePath: String) throws {
+        guard FileManager.default.fileExists(atPath: filePath)
+        else { return }
+        
         let file = URL(fileURLWithPath: filePath).lastPathComponent
+        
         let script = """
         tell application "System Events"
         tell process "Xcode"
@@ -74,8 +104,9 @@ extension Xcopen {
         _ = try Utility.execute(commandPath: "/usr/bin/osascript", arguments: ["-e", script])
     }
     
-    func openPkgInTextEdit() throws {
+    /// Opens Package.swift in Text Edit
+    /// - Throws: A `RuntimeError` describing why a file could not be opened in TextEdit.
+    static func openPkgInTextEdit() throws {
         _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: ["-e", "Package.swift"])
-    }
-    
+    }    
 }

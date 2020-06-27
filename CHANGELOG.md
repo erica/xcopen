@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.0.9
+
+Refactor to use pseudo subcommands instead of single-dash arguments. I am not using Swift Argument Parser's normal subcommands because I need to be able to call without any files listed and have the utility operate normally.
+
+Please test thoroughly as this is a pretty big update.
+
 ## 0.0.8
 
 Updates to Swift Argument Parser 0.2.0
