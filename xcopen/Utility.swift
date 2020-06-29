@@ -55,6 +55,17 @@ extension Utility {
         if !bg { try activateXcode() }
     }
     
+    /// Open files with Xcode
+    /// - Parameters:
+    ///   - filesToOpen: Ending patterns by which to match files. This can match a suffix, extension, or entire file.
+    ///   - bg: Launch xcode in the background.
+    /// - Throws: A `RuntimeError` describing the failure in opening the files.
+    static func xcopen(_ filesToOpen: [String], bg: Bool = false) throws {
+        guard !filesToOpen.isEmpty else { return }
+        _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (bg ? ["-g"] : []) + ["-a", xcurl().path] + filesToOpen)
+        if !bg { try activateXcode() }
+    }
+    
     /// Create each file and then open it in Xcode. Open but do not create if file exists
     /// - Parameters:
     ///   - patterns: Ending patterns by which to match files. This can match a suffix, extension, or entire file.

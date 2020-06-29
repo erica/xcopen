@@ -18,7 +18,7 @@ USAGE: xcopen [<paths> ...] [-bg]
 
 ARGUMENTS:
 <paths>                 Files to open. If blank, opens xcworkspace or, if not
-found, searches for xcodeproj. 
+                        found, searches for xcodeproj. 
 
 OPTIONS:
 -b, -bg, --background   Open Xcode in the background 

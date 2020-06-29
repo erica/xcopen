@@ -23,20 +23,24 @@ struct Xcopen: ParsableCommand {
 
     @Flag(name: [.customShort("b"), .customLong("bg", withSingleDash: true), .customLong("background")], help: "Open Xcode in the background")
     var openInBackground = false
+    
+    func openKnownTypes() throws {
+        let cwd = FileManager.default.currentDirectoryPath
+        let hasWorkspace = try !FileManager.default.contentsOfDirectory(atPath: cwd)
+            .filter({ $0.hasSuffix(".xcworkspace") }).isEmpty
+        switch hasWorkspace {
+        case true:
+            try Utility.searchAndOpen([".xcworkspace"], bg: openInBackground)
+        case false:
+            try Utility.searchAndOpen([".xcodeproj", ".playground"], bg: openInBackground)
+        }
+    }
 
     func run() throws {
-        var isDir: ObjCBool = false
 
         // Handle the empty paths case first. Everything else references the paths list.
         guard !paths.isEmpty else {
-            let hasWorkspace = try !FileManager.default.contentsOfDirectory(atPath: ".")
-                .filter({ $0.hasSuffix(".xcworkspace") }).isEmpty
-            switch hasWorkspace {
-            case true:
-                try Utility.searchAndOpen([".xcworkspace"], bg: openInBackground)
-            case false:
-                try Utility.searchAndOpen([".xcodeproj"], bg: openInBackground)
-            }
+            try openKnownTypes()
             return
         }
 
@@ -74,22 +78,6 @@ struct Xcopen: ParsableCommand {
             case "new":
                 break
 
-            // Check whether there is a single path and it is a directory
-            case _
-                    where
-                    paths.count == 1
-                    && FileManager.default.fileExists(atPath: paths[0], isDirectory: &isDir)
-                    && isDir.boolValue == true :
-                let dirURL = URL(fileURLWithPath: paths[0])
-                let filesToOpen = try FileManager.default
-                    .contentsOfDirectory(atPath: paths[0])
-                    .compactMap({ path -> String? in
-                        let filePath = dirURL.appendingPathComponent(path).path
-                        _ = FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
-                        return isDir.boolValue == true ? nil : filePath
-                    })
-                _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (openInBackground ? ["-g"] : []) + ["-a", Utility.xcurl().path] + filesToOpen)
-                return
             default:
                 break
             }
@@ -101,7 +89,67 @@ struct Xcopen: ParsableCommand {
             return
         }
 
-        try Utility.searchAndXcodeOpen(paths, bg: openInBackground)
+        // Separate standard, dir, and flat paths
+        let (standardPaths, remainingPaths) = paths.partition { path in
+            for ext in ["xcodeproj", "xcworkspace", "playground"] {
+                if path.trimmedDirPath().hasSuffix(ext) { return true }
+            }
+            return false
+        }
+        let (dirPaths, flatPaths) = remainingPaths.partition { $0.isDir() }
+        
+        // Open the standard paths
+        if !standardPaths.isEmpty {
+            try Utility.searchAndOpen(standardPaths.map({ $0.trimmedDirPath() }), bg: openInBackground)
+        }
+        
+        // Open flat paths
+        if !flatPaths.isEmpty {
+            try Utility.xcopen(flatPaths, bg: openInBackground)
+        }
+        
+        // Treat each folder as individual open-without-argument scenarios
+        for dirPath in dirPaths {
+            if FileManager.default.changeCurrentDirectoryPath(dirPath) {
+                try openKnownTypes()
+            }
+        }
+    }
+}
+
+extension Array where Element: Comparable {
+    /// Partitions an array in two by applying a predicate to each member.
+    /// - Parameters:
+    ///   - predicate: a Boolean test to determine membership.
+    ///   - element: A `Comparable` array element.
+    /// - Returns: A tuple of two arrays. The first array contains elements matched by the predicate.
+    ///     The second includes all non-matching elements.
+    public func partition(by predicate: (_ element: Element) -> Bool) -> (matching: [Element], notMatching: [Element]) {
+        var (matching, notMatching): ([Element], [Element]) = ([], [])
+        for element in self {
+            switch predicate(element) {
+            case true:
+                matching.append(element)
+            case false:
+                notMatching.append(element)
+            }
+        }        
+        return (matching: matching, notMatching: notMatching)
+    }
+}
+
+extension String {
+    func trimmedDirPath() -> String {
+        if self.hasSuffix("/") { return String(self.dropLast()) }
+        return self
+    }
+    
+    /// Returns boolean indicating whether a string-based path is a directory
+    func isDir() -> Bool {
+        var pathIsDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: self, isDirectory: &pathIsDir)
+        else { return false }
+        return pathIsDir.boolValue
     }
 }
 

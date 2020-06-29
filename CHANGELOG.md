@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.0
+
+Adds support for playground files
+
+Updates search strategies to allow opening standard paths (xcodeproj, xcworkspace, playground), folders (acts like no-argument opens), and flat files (open directly)
+
 ## 0.0.9
 
 Refactor to use pseudo subcommands instead of single-dash arguments. I am not using Swift Argument Parser's normal subcommands because I need to be able to call without any files listed and have the utility operate normally.
