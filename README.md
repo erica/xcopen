@@ -5,24 +5,22 @@ Because sometimes you really just want to cd and open whatever xcode project is 
 ```
 OVERVIEW: 
 xcopen <files>...        Open files in Xcode.
-xcopen                   Open workspace or xcodeproj.
-xcopen ws                Only search for workspace.
-xcopen xc                Only search for xcodeproj.
 xcopen docs              Open .md and .txt files.
-xcopen pkg               Open Package.swift in TextEdit.
-xcopen xpkg              Open Package.swift in Xcode.
 xcopen new               Create new files (if they don't exist) and
-open in Xcode.
+                         open in Xcode.
+xcopen newpg (ios|mac)   Build a new playground.
+xcopen xc, ws, pg        Open xcodeproj, workspace, playground. Pick one.
+xcopen pkg, xpkg         Open Package.swift in TextEdit/Xcode. Pick one.
 
 USAGE: xcopen [<paths> ...] [-bg]
 
 ARGUMENTS:
-<paths>                 Files to open. If blank, opens xcworkspace or, if not
-                        found, searches for xcodeproj. 
+  <paths>                 Files to open. If blank, opens xcworkspace or,
+                          if not found, searches for xcodeproj. 
 
 OPTIONS:
--b, -bg, --background   Open Xcode in the background 
--h, --help              Show help information.
+  -b, -bg, --background   Open Xcode in the background 
+  -h, --help              Show help information.
 ```
 
 

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.1
+
+Add pg-only open (xcopen pg)
+
+Add pg creation (ios and mac)
+
 ## 0.1.0
 
 Adds support for playground files

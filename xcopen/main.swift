@@ -7,23 +7,21 @@ import GeneralUtility
 struct Xcopen: ParsableCommand {
     static var configuration = CommandConfiguration(discussion: """
     xcopen <files>...        Open files in Xcode.
-    xcopen                   Open workspace or xcodeproj.
-    xcopen ws                Only search for workspace.
-    xcopen xc                Only search for xcodeproj.
     xcopen docs              Open .md and .txt files.
-    xcopen pkg               Open Package.swift in TextEdit.
-    xcopen xpkg              Open Package.swift in Xcode.
     xcopen new               Create new files (if they don't exist) and
                              open in Xcode.
+    xcopen newpg (ios|mac)   Build a new playground.
+    xcopen xc, ws, pg        Open xcodeproj, workspace, playground. Pick one.
+    xcopen pkg, xpkg         Open Package.swift in TextEdit/Xcode. Pick one.
     """)
 
 
-    @Argument(help: "Files to open. If blank, opens xcworkspace or, if not found, searches for xcodeproj.")
+    @Argument(help: "Files to open. If blank, opens xcworkspace or,if not found, searches for xcodeproj.")
     var paths: [String] = []
 
     @Flag(name: [.customShort("b"), .customLong("bg", withSingleDash: true), .customLong("background")], help: "Open Xcode in the background")
     var openInBackground = false
-    
+
     func openKnownTypes() throws {
         let cwd = FileManager.default.currentDirectoryPath
         let hasWorkspace = try !FileManager.default.contentsOfDirectory(atPath: cwd)
@@ -59,6 +57,11 @@ struct Xcopen: ParsableCommand {
                 try Utility.searchAndOpen([".xcodeproj"], bg: openInBackground)
                 return
 
+            // Opens all playground
+            case "pg":
+                try Utility.searchAndOpen([".playground"], bg: openInBackground)
+                return
+
             // Open docs
             case "docs":
                 try Utility.searchAndXcodeOpen([".txt", ".md"], bg: openInBackground)
@@ -89,6 +92,21 @@ struct Xcopen: ParsableCommand {
             return
         }
 
+        if paths[0] == "newpg" {
+            guard paths.count == 2
+            else { throw RuntimeError("Specify playground type (mac, ios).") }
+
+            switch paths[1].lowercased() {
+            case "mac":
+                try Utility.buildNewPlayground(type: .mac, bg: openInBackground)
+            case "ios":
+                try Utility.buildNewPlayground(type: .ios, bg: openInBackground)
+            default:
+                throw RuntimeError("Unsupported playground type (mac, ios).")
+            }
+            return
+        }
+
         // Separate standard, dir, and flat paths
         let (standardPaths, remainingPaths) = paths.partition { path in
             for ext in ["xcodeproj", "xcworkspace", "playground"] {
@@ -97,17 +115,17 @@ struct Xcopen: ParsableCommand {
             return false
         }
         let (dirPaths, flatPaths) = remainingPaths.partition { $0.isDir() }
-        
+
         // Open the standard paths
         if !standardPaths.isEmpty {
             try Utility.searchAndOpen(standardPaths.map({ $0.trimmedDirPath() }), bg: openInBackground)
         }
-        
+
         // Open flat paths
         if !flatPaths.isEmpty {
             try Utility.xcopen(flatPaths, bg: openInBackground)
         }
-        
+
         // Treat each folder as individual open-without-argument scenarios
         for dirPath in dirPaths {
             if FileManager.default.changeCurrentDirectoryPath(dirPath) {
@@ -133,7 +151,7 @@ extension Array where Element: Comparable {
             case false:
                 notMatching.append(element)
             }
-        }        
+        }
         return (matching: matching, notMatching: notMatching)
     }
 }
@@ -143,7 +161,7 @@ extension String {
         if self.hasSuffix("/") { return String(self.dropLast()) }
         return self
     }
-    
+
     /// Returns boolean indicating whether a string-based path is a directory
     func isDir() -> Bool {
         var pathIsDir: ObjCBool = false
