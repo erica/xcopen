@@ -15,7 +15,16 @@
         "repositoryURL": "https://github.com/erica/Swift-General-Utility",
         "state": {
           "branch": null,
-          "revision": "1fb2fe40d9645d39119c8028f6b1fc98ab25caf8",
+          "revision": "d4cd4ec6a89e7ddcdee79053acfbf95bc7730994",
+          "version": "0.0.3"
+        }
+      },
+      {
+        "package": "MacUtility",
+        "repositoryURL": "https://github.com/erica/Swift-Mac-Utility",
+        "state": {
+          "branch": null,
+          "revision": "1509b2a5f9f6bf0a8804dad1f8be4a018d757591",
           "version": "0.0.1"
         }
       }

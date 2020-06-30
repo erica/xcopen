@@ -8,9 +8,9 @@ xcopen <files>...        Open files in Xcode.
 xcopen docs              Open .md and .txt files.
 xcopen new               Create new files (if they don't exist) and
                          open in Xcode.
-xcopen newpg (ios|mac)   Build a new playground.
-xcopen xc, ws, pg        Open xcodeproj, workspace, playground. Pick one.
-xcopen pkg, xpkg         Open Package.swift in TextEdit/Xcode. Pick one.
+xcopen newpg ios|mac|tv  Build a new playground.
+xcopen xc|ws|pg          Open xcodeproj, workspace, or playground.
+xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
 
 USAGE: xcopen [<paths> ...] [-bg]
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.2
+
+Add tvos pg creation
+
 ## 0.1.1
 
 Add pg-only open (xcopen pg)

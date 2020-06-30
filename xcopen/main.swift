@@ -2,17 +2,21 @@
 
 import Foundation
 import ArgumentParser
+import MacUtility
 import GeneralUtility
 
 struct Xcopen: ParsableCommand {
+
+    // The Swift argument parser doesn't _quite_ match the utility needs
+    // so this implements pseudo-subcommands, requiring a mocked-up discussion.
     static var configuration = CommandConfiguration(discussion: """
     xcopen <files>...        Open files in Xcode.
     xcopen docs              Open .md and .txt files.
     xcopen new               Create new files (if they don't exist) and
                              open in Xcode.
-    xcopen newpg (ios|mac)   Build a new playground.
-    xcopen xc, ws, pg        Open xcodeproj, workspace, playground. Pick one.
-    xcopen pkg, xpkg         Open Package.swift in TextEdit/Xcode. Pick one.
+    xcopen newpg ios|mac|tv  Build a new playground.
+    xcopen xc|ws|pg          Open xcodeproj, workspace, or playground.
+    xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
     """)
 
 
@@ -22,6 +26,9 @@ struct Xcopen: ParsableCommand {
     @Flag(name: [.customShort("b"), .customLong("bg", withSingleDash: true), .customLong("background")], help: "Open Xcode in the background")
     var openInBackground = false
 
+    /// Open `xcworkspace`, `xcodeproj`, and `playground` files in the working
+    /// directory. If workspaces are found, they are opened. Otherwise, all project and playground
+    /// files are opened. If no known types are found, do nothing.
     func openKnownTypes() throws {
         let cwd = FileManager.default.currentDirectoryPath
         let hasWorkspace = try !FileManager.default.contentsOfDirectory(atPath: cwd)
@@ -35,7 +42,6 @@ struct Xcopen: ParsableCommand {
     }
 
     func run() throws {
-
         // Handle the empty paths case first. Everything else references the paths list.
         guard !paths.isEmpty else {
             try openKnownTypes()
@@ -47,17 +53,17 @@ struct Xcopen: ParsableCommand {
         if paths.count == 1 {
             switch paths[0] {
 
-            // Open a workspace if there's one here
+            // Open workspaces
             case "ws":
                 try Utility.searchAndOpen([".xcworkspace"], bg: openInBackground)
                 return
 
-            // Opens all xcodeproj
+            // Open projects
             case "xc":
                 try Utility.searchAndOpen([".xcodeproj"], bg: openInBackground)
                 return
 
-            // Opens all playground
+            // Open playgrounds
             case "pg":
                 try Utility.searchAndOpen([".playground"], bg: openInBackground)
                 return
@@ -77,7 +83,7 @@ struct Xcopen: ParsableCommand {
                 try Utility.searchAndXcodeOpen(["Package.swift"], bg: openInBackground)
                 return
 
-            // This is handled below
+            // This degenerate case is handled below
             case "new":
                 break
 
@@ -88,19 +94,24 @@ struct Xcopen: ParsableCommand {
 
         // Special case "new" as the first file mentioned
         if paths[0] == "new" {
+            guard paths.count > 1
+            else { throw RuntimeError("No new files to create.") }
             try Utility.createNewFilesAndOpen(Array<String>(paths.dropFirst()), bg: openInBackground)
             return
         }
 
+        // Playground creation is always `newpg type`
         if paths[0] == "newpg" {
             guard paths.count == 2
             else { throw RuntimeError("Specify playground type (mac, ios).") }
 
             switch paths[1].lowercased() {
-            case "mac":
-                try Utility.buildNewPlayground(type: .mac, bg: openInBackground)
+            case "mac", "macos", "osx":
+                try Utility.buildNewPlayground(type: .macos, bg: openInBackground)
             case "ios":
                 try Utility.buildNewPlayground(type: .ios, bg: openInBackground)
+            case "tv", "tvos":
+                try Utility.buildNewPlayground(type: .tvos, bg: openInBackground)
             default:
                 throw RuntimeError("Unsupported playground type (mac, ios).")
             }
@@ -132,42 +143,6 @@ struct Xcopen: ParsableCommand {
                 try openKnownTypes()
             }
         }
-    }
-}
-
-extension Array where Element: Comparable {
-    /// Partitions an array in two by applying a predicate to each member.
-    /// - Parameters:
-    ///   - predicate: a Boolean test to determine membership.
-    ///   - element: A `Comparable` array element.
-    /// - Returns: A tuple of two arrays. The first array contains elements matched by the predicate.
-    ///     The second includes all non-matching elements.
-    public func partition(by predicate: (_ element: Element) -> Bool) -> (matching: [Element], notMatching: [Element]) {
-        var (matching, notMatching): ([Element], [Element]) = ([], [])
-        for element in self {
-            switch predicate(element) {
-            case true:
-                matching.append(element)
-            case false:
-                notMatching.append(element)
-            }
-        }
-        return (matching: matching, notMatching: notMatching)
-    }
-}
-
-extension String {
-    func trimmedDirPath() -> String {
-        if self.hasSuffix("/") { return String(self.dropLast()) }
-        return self
-    }
-
-    /// Returns boolean indicating whether a string-based path is a directory
-    func isDir() -> Bool {
-        var pathIsDir: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: self, isDirectory: &pathIsDir)
-        else { return false }
-        return pathIsDir.boolValue
     }
 }
 
