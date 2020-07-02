@@ -14,8 +14,8 @@ struct Xcopen: ParsableCommand {
     xcopen docs              Open .md and .txt files.
     xcopen new               Create new files (if they don't exist) and
                              open in Xcode.
-    xcopen newpg ios|mac|tv  Build a new playground.
     xcopen xc|ws|pg          Open xcodeproj, workspace, or playground.
+                             Add ios|mac|tvos to create in working folder.
     xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
     """)
 
@@ -101,10 +101,7 @@ struct Xcopen: ParsableCommand {
         }
 
         // Playground creation is always `newpg type`
-        if paths[0] == "newpg" {
-            guard paths.count == 2
-            else { throw RuntimeError("Specify playground type (mac, ios).") }
-
+        if paths[0] == "pg" && paths.count == 2 {
             switch paths[1].lowercased() {
             case "mac", "macos", "osx":
                 try Utility.buildNewPlayground(type: .macos, bg: openInBackground)

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3
+
+Removed newpg. Instead call xcopen pg mac|ios|tv
+
 ## 0.1.2
 
 Add tvos pg creation
