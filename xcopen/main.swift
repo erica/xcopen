@@ -1,4 +1,4 @@
-//  Created by Erica Sadun on 6/12/20.
+//  Copyright © 2020 Erica Sadun. All rights reserved.
 
 import Foundation
 import ArgumentParser
@@ -12,10 +12,10 @@ struct Xcopen: ParsableCommand {
     static var configuration = CommandConfiguration(discussion: """
     xcopen <files>...        Open files in Xcode.
     xcopen docs              Open .md and .txt files.
-    xcopen new               Create new files (if they don't exist) and
-                             open in Xcode.
-    xcopen xc|ws|pg          Open xcodeproj, workspace, or playground.
-                             Add ios|mac|tvos to create in working folder.
+    xcopen new               Create new files (if they don't exist), open in Xcode.
+    xcopen xc|ws|pg(w)       Open xcodeproj, workspace, or playground.
+                               * Add ios|mac|tvos to create playground.
+                               * Add w (pgw) to create playground in workspace.
     xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
     """)
 
@@ -23,8 +23,15 @@ struct Xcopen: ParsableCommand {
     @Argument(help: "Files to open. If blank, opens xcworkspace or,if not found, searches for xcodeproj.")
     var paths: [String] = []
 
-    @Flag(name: [.customShort("b"), .customLong("bg", withSingleDash: true), .customLong("background")], help: "Open Xcode in the background")
+    @Flag(name: [.customShort("b"), .customShort("g"), .customLong("background")], help: "Open Xcode in the background")
     var openInBackground = false
+    
+    @Flag(name: [.customShort("f"), .customShort("e"), .customLong("folder")], help: "Enclose new items in folder")
+    var encloseInFolder = false
+    
+    @Flag(name: [.customLong("open")], inversion: .prefixedNo, help: "Open newly created playgrounds/workspaces")
+    var openAfterCreating = true
+
 
     /// Open `xcworkspace`, `xcodeproj`, and `playground` files in the working
     /// directory. If workspaces are found, they are opened. Otherwise, all project and playground
@@ -51,7 +58,7 @@ struct Xcopen: ParsableCommand {
         // Subcommands without being subcommands, allowing the utility
         // to be called without any arguments
         if paths.count == 1 {
-            switch paths[0] {
+            switch paths[0].lowercased() {
 
             // Open workspaces
             case "ws":
@@ -83,6 +90,10 @@ struct Xcopen: ParsableCommand {
                 try Utility.searchAndXcodeOpen(["Package.swift"], bg: openInBackground)
                 return
 
+            // Request new playground workspace
+            case "pgw":
+                throw RuntimeError("Must specify playground type (mac, ios, tvos).")
+
             // This degenerate case is handled below
             case "new":
                 break
@@ -93,7 +104,7 @@ struct Xcopen: ParsableCommand {
         }
 
         // Special case "new" as the first file mentioned
-        if paths[0] == "new" {
+        if paths[0].lowercased() == "new" {
             guard paths.count > 1
             else { throw RuntimeError("No new files to create.") }
             try Utility.createNewFilesAndOpen(Array<String>(paths.dropFirst()), bg: openInBackground)
@@ -101,17 +112,45 @@ struct Xcopen: ParsableCommand {
         }
 
         // Playground creation is always `newpg type`
-        if paths[0] == "pg" && paths.count == 2 {
-            switch paths[1].lowercased() {
-            case "mac", "macos", "osx":
-                try Utility.buildNewPlayground(type: .macos, bg: openInBackground)
-            case "ios":
-                try Utility.buildNewPlayground(type: .ios, bg: openInBackground)
-            case "tv", "tvos":
-                try Utility.buildNewPlayground(type: .tvos, bg: openInBackground)
-            default:
-                throw RuntimeError("Unsupported playground type (mac, ios).")
+        if (paths[0].lowercased() == "pg" || paths[0].lowercased() == "pgw") && paths.count == 2 {
+            
+            // What is the playground type?
+            let style = PGType.from(string: paths[1].lowercased())
+            if style == .other {
+                throw RuntimeError("Unsupported playground type (mac, ios, tvos).")
             }
+            let styleString = style.rawValue
+            
+            // Where does this happen?
+            var destinationURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+            var playgroundURL = destinationURL.appendingPathComponent("\(styleString).playground")
+            if encloseInFolder {
+                // Enclosing folders are versioned
+                destinationURL = destinationURL.appendingPathComponent("\(styleString) Playground").versioned()
+                playgroundURL = destinationURL.appendingPathComponent("\(styleString).playground")
+                try FileManager.default.createDirectory(at: destinationURL, withIntermediateDirectories: true, attributes: nil)
+            } else {
+                // Playgrounds in cwd are versioned
+                playgroundURL = playgroundURL.versioned()
+            }
+            
+            // Create playground
+            try Utility.createPlayground(type: style, at: playgroundURL)
+            
+            // Create workspace
+            if paths[0].lowercased() == "pgw" {
+                let coreName = playgroundURL.deletingPathExtension().lastPathComponent
+                FileManager.default.changeCurrentDirectoryPath(destinationURL.path)
+                try Utility.createPlaygroundWorkspace(coreName: coreName, at: destinationURL)
+                if openAfterCreating {
+                    _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: (openInBackground ? ["-g"] : []) + [destinationURL.appendingPathComponent("\(coreName).xcworkspace").path])
+                }
+            } else {
+                if openAfterCreating {
+                    try Utility.xcopen([playgroundURL.lastPathComponent], bg: openInBackground)
+                }
+            }
+             
             return
         }
 

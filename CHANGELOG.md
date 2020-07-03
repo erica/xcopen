@@ -1,8 +1,14 @@
 # CHANGELOG
 
+## 0.1.4
+
+Call `xcopen pgw mac|ios|tv` to create both a playground a workspace that embeds it. Add `-f` to embed both in a folder (rather than working directory) and `-no-open` to build without opening. Background `-g` works as usual, opening in Xcode in the background.
+
+Names and folders are versioned to prevent name conflicts.
+
 ## 0.1.3
 
-Removed newpg. Instead call xcopen pg mac|ios|tv
+Removed newpg. Instead call `xcopen pg mac|ios|tv`
 
 ## 0.1.2
 

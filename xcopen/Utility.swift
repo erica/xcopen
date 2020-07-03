@@ -25,6 +25,34 @@ extension Array where Element: Comparable {
     }
 }
 
+extension URL {
+    /// Create a destination URL to save a file that does not yet exist, using numbering
+    /// to ensure the new file will not overwrite any other file.
+    ///
+    /// If `file.ext` already exists, try `file 1.ext`, `file 2.ext`, and so forth.
+    ///
+    /// - Returns: a version of the destination that does not yet exist
+    public func versioned() -> URL {
+        // If the destination does not yet exist, use it
+        guard FileManager.default.fileExists(atPath: self.path)
+        else { return self }
+
+        let pathExtension = self.pathExtension
+        let corePath = self.deletingPathExtension().path
+
+        // Find an offset that does not yet exist
+        var offset = 2
+        while FileManager.default.fileExists(atPath: "\(corePath) \(offset).\(pathExtension)") { offset += 1 }
+        
+        switch pathExtension.isEmpty {
+        case true:
+            return URL(fileURLWithPath: "\(corePath) \(offset)")
+        case false:
+            return URL(fileURLWithPath: "\(corePath) \(offset).\(pathExtension)")
+        }
+    }
+}
+
 extension String {
 
     /// Trims trailing slashes from a folder path.
@@ -45,8 +73,21 @@ extension String {
 }
 
 /// Known playground types that can be created.
-enum PGType {
-    case macos, ios, tvos, other
+enum PGType: String {
+    case macos = "macOS", ios = "iOS", tvos = "tvOS", other
+    
+    static func from(string: String) -> Self {
+        switch string {
+        case "mac", "macos", "osx":
+            return .macos
+        case "ios":
+            return .ios
+        case "tv", "tvos":
+            return .tvos
+        default:
+            return .other
+        }
+    }
 }
 
 extension Utility {
@@ -136,46 +177,57 @@ extension Utility {
         _ = try Utility.execute(commandPath: "/usr/bin/open", arguments: ["-e", "Package.swift"])
     }
 
-    /// Creates a new playground in the working directory.
+    /// Creates a new playground at the destination URL
     /// - Parameters:
     ///   - type: The style of playground to create, a `PGType`
-    ///   - bg: Launch Xcode in the background
-    static func buildNewPlayground(type: PGType, bg: Bool) throws {
+    static func createPlayground(type: PGType, at destinationURL: URL) throws {
         var location = ""
-        var name = ""
         switch type {
         case .macos:
             location = "Contents/Developer/Library/Xcode/Templates/File Templates/macOS/Playground/Blank.xctemplate/___FILEBASENAME___.playground"
-            name = "macOS"
         case .ios:
             location = "Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Xcode/Templates/File Templates/iOS/Playground/Blank.xctemplate/___FILEBASENAME___.playground"
-            name = "iOS"
         case .tvos:
             location = "Contents/Developer/Platforms/AppleTVOS.platform/Developer/Library/Xcode/Templates/File Templates/tvOS/Playground/Blank.xctemplate/___FILEBASENAME___.playground"
-            name = "tvOS"
         default:
             throw RuntimeError("Unsupported playground type")
         }
 
-        let url = try xcurl()
-            .appendingPathComponent(location)
-        let destinationURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-            .appendingPathComponent("\(name).playground")
+        let sourceURL = try xcurl().appendingPathComponent(location)
 
         // Create the playground if the file does not yet exist
         if !FileManager.default.fileExists(atPath: destinationURL.path) {
-            try FileManager.default.copyItem(at: url, to: destinationURL)
-            try xcopen([destinationURL.path], bg: bg)
-            return
+            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
         }
-
-        // Find an offset name that does not yet exist
-        var offset = 2
-        while FileManager.default.fileExists(atPath: destinationURL.deletingPathExtension().path + " \(offset).playground") { offset += 1 }
-        let numberedDestinationURL = URL(fileURLWithPath: destinationURL.deletingPathExtension().path + " \(offset).playground")
-        try FileManager.default.copyItem(at: url, to: numberedDestinationURL)
-        try xcopen([numberedDestinationURL.path], bg: bg)
     }
+    
+    /// Creates a new playground workspace at the destination URL
+    /// - Parameters:
+    ///   - type: The style of playground to create, a `PGType`
+    static func createPlaygroundWorkspace(coreName: String, at destinationURL: URL) throws {
+        
+        // Create workspace directory
+        let xcwsurl = destinationURL.appendingPathComponent("\(coreName).xcworkspace")
+        try FileManager.default.createDirectory(at: xcwsurl, withIntermediateDirectories: true, attributes: nil)
+        
+//        // Create user data directory
+//        let xcudurl = xcwsurl.appendingPathComponent("xcuserdata")
+//        try FileManager.default.createDirectory(at: xcudurl, withIntermediateDirectories: true, attributes: nil)
+        
+        // Establish contents
+        let contents = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <Workspace
+        version = "1.0">
+        <FileRef
+            location = "container:\(coreName).playground">
+        </FileRef>
+        </Workspace>
+        """
+        let contentsurl = xcwsurl.appendingPathComponent("contents.xcworkspacedata")
+        FileManager.default.createFile(atPath: contentsurl.path, contents: contents.data(using: .utf8), attributes: nil)
+    }
+
 
     /// Opens and focuses the file.
     ///

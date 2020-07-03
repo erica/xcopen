@@ -2,27 +2,31 @@
 
 Because sometimes you really just want to cd and open whatever xcode project is in that folder.
 
+Xcopen also builds new files, and creates playgrounds and their hosting workspaces.
+
 ```
 OVERVIEW: 
 xcopen <files>...        Open files in Xcode.
 xcopen docs              Open .md and .txt files.
-xcopen new               Create new files (if they don't exist) and
-                         open in Xcode.
-xcopen xc|ws|pg          Open xcodeproj, workspace, or playground.
-                         Add ios|mac|tvos to create in working folder.
+xcopen new               Create new files (if they don't exist), open in Xcode.
+xcopen xc|ws|pg(w)       Open xcodeproj, workspace, or playground.
+                           * Add ios|mac|tvos to create playground.
+                           * Add w (pgw) to create playground in workspace.
 xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
 
-USAGE: xcopen [<paths> ...] [-bg]
+USAGE: xcopen [<paths> ...] [--background] [--folder] [--open] [--no-open]
 
 ARGUMENTS:
-  <paths>                 Files to open. If blank, opens xcworkspace or,
-                          if not found, searches for xcodeproj. 
+  <paths>                 Files to open. If blank, opens xcworkspace or,if not
+                          found, searches for xcodeproj. 
 
 OPTIONS:
-  -b, -bg, --background   Open Xcode in the background 
+  -b, -g, --background    Open Xcode in the background 
+  -f, -e, --folder        Enclose new items in folder 
+  --open/--no-open        Open newly created playgrounds/workspaces (default:
+                          true)
   -h, --help              Show help information.
 ```
-
 
 ## Installation
 
