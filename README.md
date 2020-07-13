@@ -13,6 +13,7 @@ xcopen xc|ws|pg(w)       Open xcodeproj, workspace, or playground.
                            * Add ios|mac|tvos to create playground.
                            * Add w (pgw) to create playground in workspace.
 xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
+xcopen uireset           Reset uistate/recent files. (Quits xcode.)
 
 USAGE: xcopen [<paths> ...] [--background] [--folder] [--open] [--no-open]
 

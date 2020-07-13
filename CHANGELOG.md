@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.5 
+
+Adds `uireset`, which gets rid of recent files by removing the current UI state (UserInterfaceState.xcuserstate)
+
 ## 0.1.4
 
 Call `xcopen pgw mac|ios|tv` to create both a playground a workspace that embeds it. Add `-f` to embed both in a folder (rather than working directory) and `-no-open` to build without opening. Background `-g` works as usual, opening in Xcode in the background.

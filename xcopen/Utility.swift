@@ -120,6 +120,34 @@ extension Utility {
         let script = #"tell application "Xcode" to activate"#
         _ = try Utility.execute(commandPath: "/usr/bin/osascript", arguments: ["-e", script])
     }
+    
+    /// Quits Xcode
+    /// - Throws: a `RuntimeError` indicating why `osascript` failed.
+    static func quitXcode() throws {
+        let script = #"tell application "Xcode" to quit"#
+        _ = try Utility.execute(commandPath: "/usr/bin/osascript", arguments: ["-e", script])
+    }
+
+    /// Resets UIState
+    static func uireset() throws {
+        try quitXcode()
+        let whoami = try execute("/usr/bin/whoami")
+        let projects = try filesWithSuffixes(["xcodeproj", "xcworkspace"])
+        for project in projects {
+            let url = URL(fileURLWithPath: project)
+                .appendingPathComponent("project.xcworkspace")
+                .appendingPathComponent("xcuserdata")
+                .appendingPathComponent("\(whoami).xcuserdatad")
+                .appendingPathComponent("UserInterfaceState.xcuserstate")
+            if FileManager.default.fileExists(atPath: url.path) {
+                var outurl: NSURL?
+                try FileManager.default.trashItem(at: url, resultingItemURL: &outurl)
+                if let outpath = outurl?.path {
+                    print("User state moved to \(outpath)")
+                }
+            }
+        }
+    }
 
     /// Search working folder for files matching the supplied patterns and open them with `open`
     /// - Parameters:

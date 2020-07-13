@@ -17,6 +17,7 @@ struct Xcopen: ParsableCommand {
                                * Add ios|mac|tvos to create playground.
                                * Add w (pgw) to create playground in workspace.
     xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
+    xcopen uireset           Reset uistate/recent files. (Quits xcode.)
     """)
 
 
@@ -94,10 +95,15 @@ struct Xcopen: ParsableCommand {
             case "pgw":
                 throw RuntimeError("Must specify playground type (mac, ios, tvos).")
 
+            // Reset the user interface state
+            case "uireset":
+                try Utility.uireset()
+                return
+
             // This degenerate case is handled below
             case "new":
                 break
-
+                
             default:
                 break
             }
