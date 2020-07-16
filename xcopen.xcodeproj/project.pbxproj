@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8E2D365224C109BC007AA94C /* MacUtility in Frameworks */ = {isa = PBXBuildFile; productRef = 8E2D365124C109BC007AA94C /* MacUtility */; };
 		8E312F562493DF3800734C68 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E312F552493DF3800734C68 /* main.swift */; };
 		8E312F5C2493DFDD00734C68 /* xcopen in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8E312F522493DF3800734C68 /* xcopen */; };
-		8E62D34924AB932C003F5864 /* MacUtility in Frameworks */ = {isa = PBXBuildFile; productRef = 8E62D34824AB932C003F5864 /* MacUtility */; };
+		8E72F67024C0FAC100E776C4 /* Utility+AssetCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72F66F24C0FAC000E776C4 /* Utility+AssetCatalog.swift */; };
+		8E72F67224C0FAD300E776C4 /* Utility+Unused.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72F67124C0FAD300E776C4 /* Utility+Unused.swift */; };
+		8E72F67424C0FB4E00E776C4 /* Utility+General.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72F67324C0FB4E00E776C4 /* Utility+General.swift */; };
+		8E72F67624C0FB7C00E776C4 /* Utility+Playground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E72F67524C0FB7C00E776C4 /* Utility+Playground.swift */; };
 		8E81697D24A1A243006A71C4 /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E81697C24A1A243006A71C4 /* Utility.swift */; };
 		8ECACEBE24A262D100E13D55 /* ArgumentParser in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECACEBD24A262D100E13D55 /* ArgumentParser */; };
-		8ECACEC124A262E500E13D55 /* GeneralUtility in Frameworks */ = {isa = PBXBuildFile; productRef = 8ECACEC024A262E500E13D55 /* GeneralUtility */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +34,10 @@
 /* Begin PBXFileReference section */
 		8E312F522493DF3800734C68 /* xcopen */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xcopen; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E312F552493DF3800734C68 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		8E72F66F24C0FAC000E776C4 /* Utility+AssetCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utility+AssetCatalog.swift"; sourceTree = "<group>"; };
+		8E72F67124C0FAD300E776C4 /* Utility+Unused.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utility+Unused.swift"; sourceTree = "<group>"; };
+		8E72F67324C0FB4E00E776C4 /* Utility+General.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utility+General.swift"; sourceTree = "<group>"; };
+		8E72F67524C0FB7C00E776C4 /* Utility+Playground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Utility+Playground.swift"; sourceTree = "<group>"; };
 		8E81697C24A1A243006A71C4 /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -39,9 +46,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8E62D34924AB932C003F5864 /* MacUtility in Frameworks */,
-				8ECACEC124A262E500E13D55 /* GeneralUtility in Frameworks */,
 				8ECACEBE24A262D100E13D55 /* ArgumentParser in Frameworks */,
+				8E2D365224C109BC007AA94C /* MacUtility in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,6 +75,10 @@
 			children = (
 				8E312F552493DF3800734C68 /* main.swift */,
 				8E81697C24A1A243006A71C4 /* Utility.swift */,
+				8E72F67524C0FB7C00E776C4 /* Utility+Playground.swift */,
+				8E72F67324C0FB4E00E776C4 /* Utility+General.swift */,
+				8E72F66F24C0FAC000E776C4 /* Utility+AssetCatalog.swift */,
+				8E72F67124C0FAD300E776C4 /* Utility+Unused.swift */,
 			);
 			path = xcopen;
 			sourceTree = "<group>";
@@ -91,8 +101,7 @@
 			name = xcopen;
 			packageProductDependencies = (
 				8ECACEBD24A262D100E13D55 /* ArgumentParser */,
-				8ECACEC024A262E500E13D55 /* GeneralUtility */,
-				8E62D34824AB932C003F5864 /* MacUtility */,
+				8E2D365124C109BC007AA94C /* MacUtility */,
 			);
 			productName = xcopen;
 			productReference = 8E312F522493DF3800734C68 /* xcopen */;
@@ -124,8 +133,7 @@
 			mainGroup = 8E312F492493DF3800734C68;
 			packageReferences = (
 				8ECACEBC24A262D100E13D55 /* XCRemoteSwiftPackageReference "Swift-Argument-Parser" */,
-				8ECACEBF24A262E500E13D55 /* XCRemoteSwiftPackageReference "Swift-General-Utility" */,
-				8E62D34724AB932C003F5864 /* XCRemoteSwiftPackageReference "Swift-Mac-Utility" */,
+				8E2D365024C109BC007AA94C /* XCRemoteSwiftPackageReference "Swift-Mac-Utility" */,
 			);
 			productRefGroup = 8E312F532493DF3800734C68 /* Products */;
 			projectDirPath = "";
@@ -143,6 +151,10 @@
 			files = (
 				8E81697D24A1A243006A71C4 /* Utility.swift in Sources */,
 				8E312F562493DF3800734C68 /* main.swift in Sources */,
+				8E72F67224C0FAD300E776C4 /* Utility+Unused.swift in Sources */,
+				8E72F67624C0FB7C00E776C4 /* Utility+Playground.swift in Sources */,
+				8E72F67424C0FB4E00E776C4 /* Utility+General.swift in Sources */,
+				8E72F67024C0FAC100E776C4 /* Utility+AssetCatalog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,12 +324,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		8E62D34724AB932C003F5864 /* XCRemoteSwiftPackageReference "Swift-Mac-Utility" */ = {
+		8E2D365024C109BC007AA94C /* XCRemoteSwiftPackageReference "Swift-Mac-Utility" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/erica/Swift-Mac-Utility.git";
 			requirement = {
 				kind = exactVersion;
-				version = 0.0.1;
+				version = 0.0.2;
 			};
 		};
 		8ECACEBC24A262D100E13D55 /* XCRemoteSwiftPackageReference "Swift-Argument-Parser" */ = {
@@ -328,31 +340,18 @@
 				version = 0.2.0;
 			};
 		};
-		8ECACEBF24A262E500E13D55 /* XCRemoteSwiftPackageReference "Swift-General-Utility" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/erica/Swift-General-Utility.git";
-			requirement = {
-				kind = exactVersion;
-				version = 0.0.3;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8E62D34824AB932C003F5864 /* MacUtility */ = {
+		8E2D365124C109BC007AA94C /* MacUtility */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 8E62D34724AB932C003F5864 /* XCRemoteSwiftPackageReference "Swift-Mac-Utility" */;
+			package = 8E2D365024C109BC007AA94C /* XCRemoteSwiftPackageReference "Swift-Mac-Utility" */;
 			productName = MacUtility;
 		};
 		8ECACEBD24A262D100E13D55 /* ArgumentParser */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8ECACEBC24A262D100E13D55 /* XCRemoteSwiftPackageReference "Swift-Argument-Parser" */;
 			productName = ArgumentParser;
-		};
-		8ECACEC024A262E500E13D55 /* GeneralUtility */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8ECACEBF24A262E500E13D55 /* XCRemoteSwiftPackageReference "Swift-General-Utility" */;
-			productName = GeneralUtility;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

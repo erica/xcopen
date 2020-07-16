@@ -18,6 +18,7 @@ struct Xcopen: ParsableCommand {
                                * Add w (pgw) to create playground in workspace.
     xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
     xcopen uireset           Reset uistate/recent files. (Quits xcode.)
+    xcopen asset             Build catalog (asset <path> <image-paths...>)
     """)
 
 
@@ -99,7 +100,7 @@ struct Xcopen: ParsableCommand {
             case "uireset":
                 try Utility.uireset()
                 return
-
+                
             // This degenerate case is handled below
             case "new":
                 break
@@ -108,12 +109,17 @@ struct Xcopen: ParsableCommand {
                 break
             }
         }
-
+        
         // Special case "new" as the first file mentioned
         if paths[0].lowercased() == "new" {
             guard paths.count > 1
             else { throw RuntimeError("No new files to create.") }
             try Utility.createNewFilesAndOpen(Array<String>(paths.dropFirst()), bg: openInBackground)
+            return
+        }
+        
+        if paths[0].lowercased().hasPrefix("asset") {
+            try Utility.buildAssets(paths)
             return
         }
 

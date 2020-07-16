@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.6
+
+Adds `asset` to build asset catalogs. Pass an optional destination and image paths.
+
 ## 0.1.5 
 
 Adds `uireset`, which gets rid of recent files by removing the current UI state (UserInterfaceState.xcuserstate)
