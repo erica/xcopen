@@ -149,6 +149,20 @@ extension Utility {
         }
     }
 
+    /// Toggles markup rendering
+    static func toggleMarkupRender() throws {
+        for project in try filesWithSuffixes(["xcodeproj", "xcworkspace"]) {
+            let url = URL(fileURLWithPath: project)
+                .appendingPathComponent(".xcodesamplecode.plist")
+            if FileManager.default.fileExists(atPath: url.path) {
+                try FileManager.default.trashItem(at: url, resultingItemURL: nil)
+            } else {
+                try #"<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"> <plist version="1.0"> <array/> </plist>"#
+                    .write(to: url, atomically: true, encoding: .utf8)
+            }
+        }
+    }
+
     /// Search working folder for files matching the supplied patterns and open them with `open`
     /// - Parameters:
     ///   - patterns: Ending patterns by which to match files. This can match a suffix, extension, or entire file.

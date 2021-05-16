@@ -1,4 +1,4 @@
-//  Copyright © 2020 Erica Sadun. All rights reserved.
+//  Copyright © 2020, 2021 Erica Sadun. All rights reserved.
 
 import Foundation
 import ArgumentParser
@@ -17,7 +17,6 @@ struct Xcopen: ParsableCommand {
                                * Add ios|mac|tvos to create playground.
                                * Add w (pgw) to create playground in workspace.
     xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
-    xcopen uireset           Reset uistate/recent files. (Quits xcode.)
     """)
 
 
@@ -98,6 +97,10 @@ struct Xcopen: ParsableCommand {
             // Reset the user interface state
             case "uireset":
                 try Utility.uireset()
+                return
+
+            case "mdtoggle":
+                try Utility.toggleMarkupRender()
                 return
 
             // This degenerate case is handled below

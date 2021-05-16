@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.1.6
+Removes `uireset` from the main menu. The menu is too cluttered. People who know about it can use it.
+
+Adds hidden `mdtoggle` which allows you to render .md files or show them raw. You need to close and reopen the file for the change to show.
+
 ## 0.1.5 
 
 Adds `uireset`, which gets rid of recent files by removing the current UI state (UserInterfaceState.xcuserstate)
