@@ -11,21 +11,21 @@
         }
       },
       {
-        "package": "GeneralUtility",
+        "package": "Swift-General-Utility",
         "repositoryURL": "https://github.com/erica/Swift-General-Utility",
         "state": {
           "branch": null,
-          "revision": "d4cd4ec6a89e7ddcdee79053acfbf95bc7730994",
-          "version": "0.0.3"
+          "revision": "07fd8dc71686f805018685635208dfac862da672",
+          "version": "0.0.6"
         }
       },
       {
-        "package": "MacUtility",
+        "package": "Swift-Mac-Utility",
         "repositoryURL": "https://github.com/erica/Swift-Mac-Utility",
         "state": {
           "branch": null,
-          "revision": "1509b2a5f9f6bf0a8804dad1f8be4a018d757591",
-          "version": "0.0.1"
+          "revision": "f41b267514f1497d60469549e63fa34abca53726",
+          "version": "0.0.3"
         }
       }
     ]

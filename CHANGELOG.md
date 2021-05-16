@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.1.7
+Updated Package.swift to modernize dependency
+
 ## 0.1.6
 Removes `uireset` from the main menu. The menu is too cluttered. People who know about it can use it.
 
