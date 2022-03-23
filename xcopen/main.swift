@@ -44,7 +44,7 @@ struct Xcopen: ParsableCommand {
         case true:
             try Utility.searchAndOpen([".xcworkspace"], bg: openInBackground)
         case false:
-            try Utility.searchAndOpen([".xcodeproj", ".playground"], bg: openInBackground)
+            try Utility.searchAndOpen([".xcodeproj", ".playground", "Package.swift"], bg: openInBackground)
         }
     }
 
