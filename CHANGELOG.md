@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.1.8
+Adds default support for `Package.swift` open.
+
+Update argument parser to version 0.4.3
+
+Makes `pkg` opening `Package.swift` in TextEdit undocumented.
+
 ## 0.1.7
 Updated Package.swift to modernize dependency
 

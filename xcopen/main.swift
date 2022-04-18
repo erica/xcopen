@@ -13,14 +13,13 @@ struct Xcopen: ParsableCommand {
     xcopen <files>...        Open files in Xcode.
     xcopen docs              Open .md and .txt files.
     xcopen new               Create new files (if they don't exist), open in Xcode.
-    xcopen xc|ws|pg(w)       Open xcodeproj, workspace, or playground.
+    xcopen xc|ws|pg(w)       Open xcworkspace, xcodeproj, Package.swift, or playground.
                                * Add ios|mac|tvos to create playground.
-                               * Add w (pgw) to create playground in workspace.
-    xcopen pkg|xpkg          Open Package.swift in TextEdit or Xcode.
+                               * Use pgw to create playground in workspace.
     """)
 
 
-    @Argument(help: "Files to open. If blank, opens xcworkspace or,if not found, searches for xcodeproj.")
+    @Argument(help: "Files to open. If blank, opens xcworkspace; if not found, searches for xcodeproj, Package.swift, playground.")
     var paths: [String] = []
 
     @Flag(name: [.customShort("b"), .customShort("g"), .customLong("background")], help: "Open Xcode in the background")
@@ -33,8 +32,8 @@ struct Xcopen: ParsableCommand {
     var openAfterCreating = true
 
 
-    /// Open `xcworkspace`, `xcodeproj`, and `playground` files in the working
-    /// directory. If workspaces are found, they are opened. Otherwise, all project and playground
+    /// Open `xcworkspace`, `xcodeproj`, `Package.swift`, and `playground` files in
+    /// the working directory. If workspaces are found, they are opened. Otherwise, all project and playground
     /// files are opened. If no known types are found, do nothing.
     func openKnownTypes() throws {
         let cwd = FileManager.default.currentDirectoryPath
@@ -80,7 +79,8 @@ struct Xcopen: ParsableCommand {
                 try Utility.searchAndXcodeOpen([".txt", ".md"], bg: openInBackground)
                 return
 
-            // Open Package.swift in Textedit
+            // Open Package.swift in Textedit. This is no longer a documented
+            // feature but I find it very handy
             case "pkg":
                 try Utility.openPkgInTextEdit()
                 return
@@ -94,11 +94,12 @@ struct Xcopen: ParsableCommand {
             case "pgw":
                 throw RuntimeError("Must specify playground type (mac, ios, tvos).")
 
-            // Reset the user interface state
+            // Reset the user interface state. Undoc.
             case "uireset":
                 try Utility.uireset()
                 return
 
+            // A convenience feature. Undoc.
             case "mdtoggle":
                 try Utility.toggleMarkupRender()
                 return
@@ -120,7 +121,7 @@ struct Xcopen: ParsableCommand {
             return
         }
 
-        // Playground creation is always `newpg type`
+        // Playground creation is always `pg type`
         if (paths[0].lowercased() == "pg" || paths[0].lowercased() == "pgw") && paths.count == 2 {
             
             // What is the playground type?
